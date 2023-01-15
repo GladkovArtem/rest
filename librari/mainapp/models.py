@@ -30,7 +30,7 @@ class TODO(models.Model):
     text = models.CharField(max_length=512, verbose_name='Текст')
     create_date = models.DateTimeField(verbose_name='Дата создания')
     update_date = models.DateTimeField(verbose_name='Дата обновления')
-    author = models.OneToOneField(Author, on_delete=models.CASCADE)
+    author = models.ManyToManyField(Author)
     is_active = models.BooleanField(verbose_name='Статус активности')
 
     class Meta:
