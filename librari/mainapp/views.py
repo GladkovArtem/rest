@@ -1,4 +1,5 @@
 from rest_framework import viewsets, mixins
+from rest_framework.permissions import AllowAny
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from .models import Author, Project, TODO
@@ -18,6 +19,7 @@ class ProjectPagination(LimitOffsetPagination):
 
 
 class ProjectModelViewSet(ModelViewSet):
+    #permission_classes = [AllowAny]
     queryset = Project.objects.all()
     serializer_class = ProjectModelSerializer
     pagination_class = ProjectPagination
