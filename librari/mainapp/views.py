@@ -33,13 +33,23 @@ class TODOPagination(LimitOffsetPagination):
     default_limit = 20
 
 
-class TODOCustomViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
+# class TODOFilter(filter.FilterSet):
+#     project = filters.CharFilter(lookup_expr='contains')
+#
+#     class Meta:
+#          model = `тодо`
+#         fields = ['project']
+
+
+class TODOCustomViewSet(ModelViewSet):
     queryset = TODO.objects.all()
     serializer_class = TODOModelSerializer
     renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
     filterset_fields = ['project']
     pagination_class = TODOPagination
-    def destroy(self):
-        return self.is_active == False
+
+    def perform_destroy(self, instance):
+        instance.is_active = False
+        instance.save()
 
 
