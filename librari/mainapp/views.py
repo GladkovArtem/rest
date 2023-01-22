@@ -1,18 +1,45 @@
-from rest_framework.viewsets import ModelViewSet
+from rest_framework import viewsets, mixins
+from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
+from rest_framework.viewsets import ModelViewSet, ViewSet
 from .models import Author, Project, TODO
 from .serializers import AuthorModelSerializer, ProjectModelSerializer, TODOModelSerializer
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.decorators import action
 
 
-class AuthorModelViewSet(ModelViewSet):
+class AuthorCustomViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorModelSerializer
+    renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
+
+
+class ProjectPagination(LimitOffsetPagination):
+    default_limit = 10
 
 
 class ProjectModelViewSet(ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectModelSerializer
+    pagination_class = ProjectPagination
+
+    def get_queryset(self):
+        param = self.request.query_params.get('name')
+        if param:
+            return Project.objects.filter(project_name__contains=param[0])
+        return super().get_queryset()
 
 
-class TODOModelViewSet(ModelViewSet):
+class TODOPagination(LimitOffsetPagination):
+    default_limit = 20
+
+
+class TODOCustomViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = TODO.objects.all()
     serializer_class = TODOModelSerializer
+    renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
+    filterset_fields = ['project']
+    pagination_class = TODOPagination
+    def destroy(self):
+        return self.is_active == False
+
+
