@@ -2,7 +2,20 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import AuthorList from './components/Author.js'
+import ProjectList from './components/Project.js'
+import TODOList from './components/Todos.js'
+import  UserTODOList from './components/UserTODO.js'
 import axios from 'axios'
+import {BrowserRouter, HashRouter, Route, Link, Switch, Redirect} from 'react-router-dom'
+
+
+const NotFound404 = ({location}) => {
+    return (
+        <div>
+            <h1>Страница по адресу `{location.pathname}` не найдена</h1>
+        </div>
+    )
+}
 
 
 class App extends React.Component {
@@ -10,49 +23,72 @@ class App extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            'authors': []
+            'authors': [],
+            'projects': [],
+            'todos': []
         }
     }
 
     componentDidMount() {
         axios.get('http://127.0.0.1:8000/api/authors')
             .then(response => {
-                const authors = response.data
+                const authors = response.data.results
                     this.setState(
                         {
                             'authors': authors
                         }
                     )
             }).catch(error => console.log(error))
-    }
-//    componentDidMount() {
-//        const authors = [
-//            {
-//                'id': '3beeb1f1-2ec2-475e-bd38-4952f2e4235b',
-//                'first_name': 'Фёдор',
-//                'last_name': 'Достоевский',
-//                'email': 'react@gb.com',
-//                'user_name': 'react'
-//            },
-//            {
-//                'id': '2831e77b-463d-4678-b261-cb52684db28a',
-//                'first_name': 'Фёдор',
-//                'last_name': 'Достоевский2',
-//                'email': 'react@gb.ru',
-//                'user_name': 'rest'
-//            },
-//        ]
-//        this.setState(
-//            {
-//                'authors': authors
-//            }
-//        )
-//    }
+
+        axios.get('http://127.0.0.1:8000/api/projects')
+            .then(response => {
+                const projects = response.data.results
+                    this.setState(
+                        {
+                            'projects': projects
+                        }
+                    )
+            }).catch(error => console.log(error))
+
+        axios.get('http://127.0.0.1:8000/api/todos')
+            .then(response => {
+                const todos = response.data.results
+                    this.setState(
+                        {
+                            'todos': todos
+                        }
+                    )
+            }).catch(error => console.log(error))
+   }
+
 
     render () {
         return (
-            <div>
-                <AuthorList authors={this.state.authors} />
+            <div className='App'>
+                <HashRouter>
+                    <nav>
+                        <ul>
+                            <li>
+                                <Link to='/'>Users</Link>
+                            </li>
+                            <li>
+                                 <Link to='/projects'>Projects</Link>
+                            </li>
+                            <li>
+                                 <Link to='/todos'>Todos</Link>
+                            </li>
+
+                        </ul>
+                    </nav>
+                    <Switch>
+                        <Route exact path='/' component={() => <AuthorList authors={this.state.authors} />} />
+                        <Route exact path='/projects' component={() => <ProjectList projects={this.state.projects} />} />
+                        <Route exact path='/todos' component={() => <TODOList items={this.state.todos} />} />
+                        <Route exact path='/author/:id' component={() => <UserTODOList items={this.state.todos} />} />
+                        <Redirect from='/authors' to='/'/>
+                        <Route component={NotFound404}/>
+                    </Switch>
+                </HashRouter>
             </div>
         )
     }
