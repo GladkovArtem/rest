@@ -1,5 +1,5 @@
 from rest_framework import viewsets, mixins
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from .models import Author, Project, TODO
@@ -10,6 +10,7 @@ from rest_framework.decorators import action
 
 class AuthorCustomViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
     queryset = Author.objects.all()
+    permission_classes = [IsAuthenticated]
     serializer_class = AuthorModelSerializer
     renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
 
