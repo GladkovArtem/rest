@@ -8,6 +8,12 @@ class AuthorModelSerializer(ModelSerializer):
         fields = '__all__'
 
 
+class AuthorModelSerializer2(ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ['id', 'first_name', 'last_name', 'email', 'user_name']
+
+
 class ProjectModelSerializer(ModelSerializer):
     class Meta:
         model = Project

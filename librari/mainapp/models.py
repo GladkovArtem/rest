@@ -8,6 +8,8 @@ class Author(models.Model):
     last_name = models.CharField(max_length=64, verbose_name='Фамилия')
     email = models.EmailField(blank=True, verbose_name='Email', unique=True)
     user_name = models.CharField(max_length=64, default=email, verbose_name='Пользователь', unique=True)
+    is_superuser = models.BooleanField(verbose_name='Признак суперпользователя', default=False)
+    is_staff = models.BooleanField(verbose_name='Признак обычного сотрудника', default=True)
     # birthday_year = models.PositiveSmallIntegerField()
 
     class Meta:

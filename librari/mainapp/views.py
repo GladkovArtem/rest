@@ -1,16 +1,17 @@
-from rest_framework import viewsets, mixins
+import generics as generics
+from rest_framework import viewsets, mixins, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from .models import Author, Project, TODO
-from .serializers import AuthorModelSerializer, ProjectModelSerializer, TODOModelSerializer
+from .serializers import AuthorModelSerializer, ProjectModelSerializer, TODOModelSerializer, AuthorModelSerializer2
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.decorators import action
 
 
-class AuthorCustomViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+class AuthorCustomViewSet(ModelViewSet):
     queryset = Author.objects.all()
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = AuthorModelSerializer
     renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
 
@@ -56,3 +57,11 @@ class TODOCustomViewSet(ModelViewSet):
         instance.save()
 
 
+class MyAPIView(generics.ListAPIView):
+    queryset = Author.objects.all()
+    serializer = AuthorModelSerializer
+
+    def get_serializer_class(self):
+        if self.request.version == '1':
+            return AuthorModelSerializer
+        return AuthorModelSerializer2
