@@ -10,7 +10,7 @@ from rest_framework.decorators import action
 
 class AuthorCustomViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
     queryset = Author.objects.all()
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = AuthorModelSerializer
     renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
 
