@@ -8,6 +8,7 @@ import  UserTODOList from './components/UserTODO.js'
 import axios from 'axios'
 import {BrowserRouter, HashRouter, Route, Link, Switch, Redirect} from 'react-router-dom'
 import LoginForm from './components/Auth.js'
+import ProjectForm from './components/ProjectForm.js'
 import Cookies from 'universal-cookie';
 
 const NotFound404 = ({location}) => {
@@ -39,7 +40,7 @@ class App extends React.Component {
     }
 
     is_authenticated() {
-        return this.state.token != ''
+        return this.state.token !== ''
     }
 
     logout() {
@@ -54,7 +55,7 @@ class App extends React.Component {
     }
 
     get_token(username, password) {
-        axios.post('http://127.0.0.1:8000/api-token-auth', {username: username, password: password})
+        axios.post('http://127.0.0.1:8000/api-token-auth/', {username: username, password: password})
             .then(response => {
                 this.set_token(response.data['token'])
 
@@ -70,6 +71,34 @@ class App extends React.Component {
             headers['Authorization'] = 'Token ' + this.state.token
         }
         return headers
+    }
+
+    createProject(project_name,link, authors){
+        const headers = this.get_headers()
+        const data = {project_name: project_name,link: link, authors: authors}
+        axios.post('http://127.0.0.1:8000/api/projects', data, {headers})
+            .then(response => {
+                let new_project = response.data
+                const authors = this.state.authors.filter((author)=> author.id === new_project.authors)[0]
+                new_project.authors = authors
+                this.setState({projects:[...this.state.projects, new_project]})
+            }).catch(error => console.log(error))
+    }
+
+    deleteProject(id) {
+        const headers = this.get_headers()
+        axios.delete(`http://127.0.0.1:8000/api/projects/${id}`,{headers})
+            .then(response => {
+                this.setState({projects: this.state.projects.filter((project)=> project.id !== id)})
+            }).catch(error => console.log(error))
+    }
+
+    deleteTODO(id) {
+        const headers = this.get_headers()
+        axios.delete(`http://127.0.0.1:8000/api/todos/${id}`,{headers})
+            .then(response => {
+                this.setState({todos: this.state.todos.filter((item)=> item.id !== id)})
+            }).catch(error => console.log(error))
     }
 
     load_data () {
@@ -132,8 +161,9 @@ class App extends React.Component {
                     </nav>
                     <Switch>
                         <Route exact path='/' component={() => <AuthorList authors={this.state.authors} />} />
-                        <Route exact path='/projects' component={() => <ProjectList projects={this.state.projects} />} />
-                        <Route exact path='/todos' component={() => <TODOList items={this.state.todos} />} />
+                        <Route exact path='/projects/create' component={() => <ProjectForm authors={this.state.authors} createProject={(project_name,link, authors)=> this.createProject(project_name,link, authors)} />} />
+                        <Route exact path='/projects' component={() => <ProjectList projects={this.state.projects} deleteProject={(id)=>this.deleteProject(id)}/>} />
+                        <Route exact path='/todos' component={() => <TODOList items={this.state.todos} deleteTODO={(id)=>this.deleteTODO(id)}/>} />
                         <Route exact path='/author/:id' component={() => <UserTODOList items={this.state.todos} />} />
                         <Route exact path='/login' component={() => <LoginForm get_token={(username, password) => this.get_token(username, password)}/>} />
                         <Redirect from='/authors' to='/'/>

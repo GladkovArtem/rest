@@ -1,7 +1,7 @@
 import React from 'react'
 
 
-const TODOItem = ({item}) => {
+const TODOItem = ({item, deleteTODO}) => {
     return (
         <tr>
             <td>
@@ -22,12 +22,14 @@ const TODOItem = ({item}) => {
             <td>
                 {item.is_active}
             </td>
+            <td><button onClick={()=>deleteTODO(item.id)} type='button'>Delete</button></td>
         </tr>
+
     )
 }
 
 
-const TODOList = ({items}) => {
+const TODOList = ({items,deleteTODO}) => {
     return (
         <table>
             <th>
@@ -48,7 +50,7 @@ const TODOList = ({items}) => {
             <th>
                 Close
             </th>
-            {items.map((item) => <TODOItem item={item} />)}
+            {items.map((item) => <TODOItem item={item} deleteTODO={deleteTODO}/>)}
         </table>
     )
 }
